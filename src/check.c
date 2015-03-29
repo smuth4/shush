@@ -17,6 +17,7 @@
 #include <pwd.h>
 #include <stdarg.h>
 #include <sys/wait.h>
+#include <time.h>
 
 #include "check.h"
 #include "analyzer.h"
