@@ -38,6 +38,7 @@ Makefile
 src/Makefile
 src/config.h
 
-# make output
+# Makefile output
 src/shush
 src/signals.h
+*.rpm
