@@ -1,0 +1,56 @@
+#
+# Copyright (C) 2003, 2004, 2005 Christophe Kalt
+#
+# This file is part of shush,
+# see the LICENSE file for details on your rights.
+#
+# $Id: Makefile.in 1404 2008-03-08 23:25:46Z kalt $
+#
+
+SHELL	=	/bin/sh
+CC	=	@CC@
+CPPFLAGS=	@CPPFLAGS@
+CFLAGS	=	@CFLAGS@
+LDFLAGS	=	@LDFLAGS@
+LIBS	=	@LIBS@
+FLEX	=	flex #-d
+YACC	=	yacc -t #-v
+
+OBJS	=	analyzer.o byteset.o cf.o check.o crontab.o debug.o error.o exec.o gethostname.o ifparser.tab.o ifparser.lex.o mmap.o run.o siglist.o shush.o state.o units.o variable.o
+SRCS	=	$(OBJS:%.o=%.c)
+
+shush	: $(OBJS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(OBJS) $(LDFLAGS) $(LIBS) -o shush
+
+pure	: $(OBJS)
+	purify $(CC) $(CPPFLAGS) $(CFLAGS) $(OBJS) $(LDFLAGS) $(LIBS) -o shush.pure
+
+ifparser_test: byteset.o ifparser_test.o ifparser.tab.o ifparser.lex.o
+	$(CC) $(CPPFLAGS) $(CFLAGS) byteset.o ifparser_test.o ifparser.tab.o ifparser.lex.o -o ifparser_test
+
+depend  : $(SRCS)
+	@rm -f Makefile.deps
+	$(CC) $(CPPFLAGS) -MM $(SRCS) \
+		| sed 's/\([^\\]\)$$/\1 Makefile/' > Makefile.deps
+
+clean	:
+	/bin/rm -f *.o core *.core
+
+distclean: clean
+	/bin/rm -f Makefile config.h shush
+
+ifparser.tab.c ifparser.tab.h: ifparser.y
+	$(YACC) -b ifparser -p ifparser_ -d ifparser.y
+
+ifparser.lex.c: ifparser.l
+	$(FLEX) -s -Pifparser_ -oifparser.lex.c ifparser.l
+
+signals.h: signals.awk Makefile
+	@rm -f signals.h
+	cat /usr/include/signal.h /usr/include/sys/signal.h \
+		/usr/include/sys/iso/signal_iso.h \
+		/usr/include/bits/signum.h 2> /dev/null | \
+		awk -f signals.awk > signals.h
+	@chmod 644 signals.h
+
+include Makefile.deps

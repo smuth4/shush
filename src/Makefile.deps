@@ -1,0 +1,28 @@
+analyzer.o: analyzer.c os.h config.h error.h analyzer.h byteset.h cf.h \
+  debug.h mmap.h variable.h Makefile
+byteset.o: byteset.c os.h config.h error.h byteset.h Makefile
+cf.o: cf.c os.h config.h error.h cf.h byteset.h gethostname.h ifparser.h \
+  mmap.h siglist.h units.h Makefile
+check.o: check.c os.h config.h error.h check.h analyzer.h cf.h debug.h \
+  exec.h mmap.h variable.h version.h Makefile
+crontab.o: crontab.c os.h config.h error.h crontab.h cf.h exec.h \
+  gethostname.h mmap.h version.h Makefile
+debug.o: debug.c os.h config.h error.h debug.h Makefile
+error.o: error.c os.h config.h error.h gethostname.h Makefile
+exec.o: exec.c os.h config.h error.h exec.h Makefile
+gethostname.o: gethostname.c os.h config.h error.h gethostname.h Makefile
+ifparser.tab.o: ifparser.tab.c os.h config.h error.h ifparser.h byteset.h \
+  variable.h Makefile
+ifparser.lex.o: ifparser.lex.c os.h config.h error.h ifparser.h \
+  ifparser.tab.h Makefile
+mmap.o: mmap.c os.h config.h error.h mmap.h Makefile
+run.o: run.c os.h config.h error.h run.h analyzer.h byteset.h cf.h \
+  debug.h exec.h gethostname.h ifparser.h mmap.h siglist.h state.h \
+  units.h variable.h version.h Makefile
+siglist.o: siglist.c os.h config.h error.h siglist.h signals.h Makefile
+shush.o: shush.c os.h config.h error.h version.h debug.h check.h \
+  crontab.h run.h Makefile
+state.o: state.c os.h config.h error.h state.h cf.h debug.h gethostname.h \
+  units.h version.h Makefile
+units.o: units.c os.h config.h error.h units.h Makefile
+variable.o: variable.c os.h config.h error.h variable.h Makefile

@@ -1,0 +1,48 @@
+-- shush dependencies
+
+If you want Perl Compatible Regular Expression support, you'll need the
+PCRE library:
+
++ pcre: http://www.pcre.org/
+
+Although this package uses autoconf, there is no real attempt to make sure
+it works on older UNIX systems as it relies on a number of somewhat modern
+system calls.
+
+-- shush installation notes
+
+(1) ./configure
+
+    The following options are of interest:
+
+	--with-pcre	 Where to find the PCRE lib if you want PCRE support.
+
+	--with-syslog	 Default syslog facility to use.      (Default: cron)
+
+	--with-sizelimit Default output size limit for mail.  (Default: 1000k)
+
+    The latter should be set accordingly with your site's MTA configuration.
+
+(2) make
+(3) make install
+
+-- shush contact
+
+If you want to be informed about important news about shush, such as new
+releases, subscribe to the shush-announce mailing list, either by sending a
+mail including the "subscribe" keyword to shush-announce-request@taranis.org,
+or simply visit the following web page:
+        http://web.taranis.org/mailman/listinfo/shush-announce
+
+Send bug reports to `shush-bugs@taranis.org'.  A bug report is an adequate
+description of the environment (versions of this package, the OS) and of
+the problem: your input, what you expected, what you got, and why you
+believe it to be wrong.  Diffs are welcome, but they only describe a
+solution, from which the problem might be difficult to infer.
+
+Your feedback will help to make a better and more portable package.
+Consider documentation errors as bugs, and report them as such.  If you
+develop anything pertaining to `shush' or have suggestions, share your
+findings by writing to `shush@taranis.org'.
+
+-- $Id: INSTALL 1404 2008-03-08 23:25:46Z kalt $
