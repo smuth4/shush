@@ -8,9 +8,8 @@
 #define NOT 264
 #define MINUS 265
 #define DOLLAR 266
-typedef union
-{
-    long	integer;
-    char *	string;
+typedef union {
+    long integer;
+    char *string;
 } YYSTYPE;
 extern YYSTYPE ifparser_lval;

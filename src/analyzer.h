@@ -8,7 +8,7 @@
 */
 
 #if !defined(_ANALYZER_H_)
-# define _ANALYZER_H_
+#define _ANALYZER_H_
 
 extern time_t out_timestamp, err_timestamp;
 extern size_t out_size, err_size;
@@ -16,6 +16,7 @@ extern char out_md5[], err_md5[];
 
 int analyzer_init(char *, char *);
 int analyzer_run(char *, size_t, char *, size_t);
-int analyzer_output(FILE *, int, int, size_t, char *, size_t, char *, size_t);
+int analyzer_output(FILE *, int, int, size_t, char *, size_t, char *,
+		    size_t);
 
 #endif

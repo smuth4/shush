@@ -8,7 +8,7 @@
 */
 
 #if !defined(_UNITS_H_)
-# define _UNITS_H_
+#define _UNITS_H_
 
 u_int unit_time(char *);
 char *unit_rtime(u_int);

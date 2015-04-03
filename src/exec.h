@@ -8,7 +8,7 @@
 */
 
 #if !defined(_EXEC_H_)
-# define _EXEC_H_
+#define _EXEC_H_
 
 pid_t exec(int, int, int, int, char **);
 

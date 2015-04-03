@@ -8,10 +8,10 @@
 */
 
 #if !defined(_BYTESET_H_)
-# define _BYTESET_H_
+#define _BYTESET_H_
 
 void byteset_init(char *, int);
 void byteset_set(int, int);
-int  byteset_get(int);
+int byteset_get(int);
 
 #endif

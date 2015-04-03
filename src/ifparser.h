@@ -8,7 +8,7 @@
 */
 
 #if !defined(_IFPARSER_H_)
-# define _IFPARSER_H_
+#define _IFPARSER_H_
 
 void ifparser_init(char *);
 int ifparser_lex(void);

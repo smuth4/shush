@@ -8,10 +8,9 @@
 */
 
 #if !defined(_CF_H_)
-# define _CF_H_
+#define _CF_H_
 
-enum
-{
+enum {
     CF_RPTNAME = 0,
     CF_RPTTO,
     CF_RPTCC,
@@ -24,7 +23,7 @@ enum
     CF_RPTFORMAT,
     CF_RPTSTDERR,
     CF_RPTHEADER,
-    CF_RPT_MAX, /* order of the above enums MATTERS */
+    CF_RPT_MAX,			/* order of the above enums MATTERS */
     CF_CMD,
     CF_CONFIG,
     CF_LOCK,

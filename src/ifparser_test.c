@@ -17,8 +17,7 @@ char *myname;
 char *tests[] = {
 };
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     myname = basename(argv[0]);
     ifparser_init("30+2+4+ 99 && a");

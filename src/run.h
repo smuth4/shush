@@ -8,7 +8,7 @@
 */
 
 #if !defined(_RUN_H_)
-# define _RUN_H_
+#define _RUN_H_
 
 #define RUN_FAST	0x01
 #define RUN_TAIL	0x02

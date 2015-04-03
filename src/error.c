@@ -14,7 +14,8 @@
 #include "gethostname.h"
 
 #ifndef lint
-static char const rcsid[] = "@(#)$Id: error.c 1404 2008-03-08 23:25:46Z kalt $";
+static char const rcsid[] =
+    "@(#)$Id: error.c 1404 2008-03-08 23:25:46Z kalt $";
 #endif
 
 static int prefix, tosyslog;
@@ -24,8 +25,7 @@ static char *task, *id;
 ** error_init
 **	Whether or not to write a header prior to any error message
 */
-void
-error_init(char *name, char *jid, int copytosyslog)
+void error_init(char *name, char *jid, int copytosyslog)
 {
     task = name;
     id = jid;
@@ -40,19 +40,21 @@ error_init(char *name, char *jid, int copytosyslog)
 ** error
 **	output a message optionally preceeded by a header
 */
-void
-error(char *format, ...)
+void error(char *format, ...)
 {
     va_list va;
 
-    if (task != NULL)
-      {
-        if (*id != '\0')
-            fprintf(stderr, "%s[%s] encountered the following error(s) while running \"%s\" on host %s:\n\n", myname, task, id, get_hostname(0));
-        else
-            fprintf(stderr, "%s encountered the following error(s) while running \"%s\" on host %s:\n\n", myname, task, get_hostname(0));
+    if (task != NULL) {
+	if (*id != '\0')
+	    fprintf(stderr,
+		    "%s[%s] encountered the following error(s) while running \"%s\" on host %s:\n\n",
+		    myname, task, id, get_hostname(0));
+	else
+	    fprintf(stderr,
+		    "%s encountered the following error(s) while running \"%s\" on host %s:\n\n",
+		    myname, task, get_hostname(0));
 	task = NULL;
-      }
+    }
 
     if (prefix)
 	fprintf(stderr, "%s: ", myname);
@@ -73,14 +75,14 @@ error(char *format, ...)
 ** myassert
 **	_assert() replacement
 */
-void
-myassert(char *assertion, char *file, char *function, int line)
+void myassert(char *assertion, char *file, char *function, int line)
 {
     if (function != NULL)
 	error("Assertion failed: %s, file %s, function %s, line %d",
 	      assertion, file, function, line);
     else
-	error("Assertion failed: %s, file %s, line %d", assertion, file, line);
+	error("Assertion failed: %s, file %s, line %d", assertion, file,
+	      line);
     abort();
 }
 
@@ -88,13 +90,15 @@ myassert(char *assertion, char *file, char *function, int line)
 ** myabort()
 **	abort() replacement
 */
-void
-myabort(char *file, char *function, int line)
+void myabort(char *file, char *function, int line)
 {
     if (function != NULL)
-	error("The impossible just happened: line %d in function \"%s\" in file %s was reached!", line, function, file);
+	error
+	    ("The impossible just happened: line %d in function \"%s\" in file %s was reached!",
+	     line, function, file);
     else
-	error("The impossible just happened: line %d in file %s was reached!",
-	      line, file);
+	error
+	    ("The impossible just happened: line %d in file %s was reached!",
+	     line, file);
     abort();
 }

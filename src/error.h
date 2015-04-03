@@ -8,7 +8,7 @@
 */
 
 #if !defined(_ERROR_H_)
-# define _ERROR_H_
+#define _ERROR_H_
 
 #define ERRSTR strerror(errno)
 
@@ -16,28 +16,28 @@ void error_init(char *, char *, int);
 
 void error(char *, ...)
 #if ( __GNUC__ == 2 && __GNUC_MINOR__ >= 5 ) || __GNUC__ >= 3
-	__attribute__((__format__(__printf__, 1, 2)))
+    __attribute__ ((__format__(__printf__, 1, 2)))
 #endif
-	;
+    ;
 
 void myassert(char *, char *, char *, int)
 #if ( __GNUC__ == 2 && __GNUC_MINOR__ >= 5 ) || __GNUC__ >= 3
-	__attribute__((__noreturn__))
+    __attribute__ ((__noreturn__))
 #endif
-	;
+    ;
 #if !defined(__func__)
-# define __func__ NULL
+#define __func__ NULL
 #endif
 #if defined(__STDC__)
-# define assert(x) if (!(x)) myassert(#x, __FILE__, __func__, __LINE__)
+#define assert(x) if (!(x)) myassert(#x, __FILE__, __func__, __LINE__)
 #else
-# define assert(x) if (!(x)) myassert("x", __FILE__, __func__, __LINE__)
+#define assert(x) if (!(x)) myassert("x", __FILE__, __func__, __LINE__)
 #endif
 void myabort(char *, char *, int)
 #if ( __GNUC__ == 2 && __GNUC_MINOR__ >= 5 ) || __GNUC__ >= 3
-	__attribute__((__noreturn__))
+    __attribute__ ((__noreturn__))
 #endif
-	;
+    ;
 #define abort() myabort(__FILE__, __func__, __LINE__)
 
 #endif

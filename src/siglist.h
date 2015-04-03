@@ -8,7 +8,7 @@
 */
 
 #if !defined(_SIGLIST_H_)
-# define _SIGLIST_H_
+#define _SIGLIST_H_
 
 int getsignumbyname(char *);
 char *getsignamebynum(int);

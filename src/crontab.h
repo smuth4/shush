@@ -8,7 +8,7 @@
 */
 
 #if !defined(_CRONTAB_H_)
-# define _CRONTAB_H_
+#define _CRONTAB_H_
 
 #define CRONTAB_SETNEW 1
 #define CRONTAB_UPDATE 2

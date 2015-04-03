@@ -10,9 +10,9 @@
 #include <ctype.h>
 #include <fcntl.h>
 #if defined(HAVE_PATHS_H)
-# include <paths.h>
+#include <paths.h>
 #else
-# define _PATH_TMP "/tmp"
+#define _PATH_TMP "/tmp"
 #endif
 #include <pwd.h>
 #include <stdarg.h>
@@ -28,10 +28,10 @@
 #include "variable.h"
 #include "version.h"
 
-static char const rcsid[] = "@(#)$Id: check.c 1404 2008-03-08 23:25:46Z kalt $";
+static char const rcsid[] =
+    "@(#)$Id: check.c 1404 2008-03-08 23:25:46Z kalt $";
 
-static char *
-mystrftime(char *format, time_t when)
+static char *mystrftime(char *format, time_t when)
 {
     struct tm *tm;
     static char timestr[256];
@@ -43,22 +43,24 @@ mystrftime(char *format, time_t when)
 }
 
 void
-checkrun(char *cfdir, char *job, char *outlog, char *errlog, char *to[], char *envp[])
+checkrun(char *cfdir, char *job, char *outlog, char *errlog, char *to[],
+	 char *envp[])
 {
-    char fname[PATH_MAX], outre[PATH_MAX], errre[PATH_MAX], *outstr, *errstr;
+    char fname[PATH_MAX], outre[PATH_MAX], errre[PATH_MAX], *outstr,
+	*errstr;
     size_t outlen, errlen;
     int rpt;
     struct passwd *pw;
 
-    assert( cfdir != NULL );
-    assert( job != NULL );
-    assert( outlog != NULL || errlog == NULL );
+    assert(cfdir != NULL);
+    assert(job != NULL);
+    assert(outlog != NULL || errlog == NULL);
 
     pw = getpwuid(getuid());
     /* Load the configuration */
     snprintf(fname, PATH_MAX, "%s/%s", cfdir, job);
     cf_load(fname, "");
-    assert( cf_timestamp != 0 );
+    assert(cf_timestamp != 0);
     printf("%s: %s %ld %s\n", job,
 	   mystrftime("%Y/%m/%d %H:%M:%S", cf_timestamp), cf_size, cf_md5);
     snprintf(outre, PATH_MAX, "%s.stdout", cf_getstr(CF_CONFIG));
@@ -78,14 +80,12 @@ checkrun(char *cfdir, char *job, char *outlog, char *errlog, char *to[], char *e
 	return;
 
     /* Map outputs to memory */
-    if (mapfile(outlog, -1, (void **)&outstr, &outlen) != 0)
+    if (mapfile(outlog, -1, (void **) &outstr, &outlen) != 0)
 	exit(1);
-    if (errlog == NULL)
-      {
+    if (errlog == NULL) {
 	errstr = NULL;
 	errlen = 0;
-      }
-    else if (mapfile(errlog, -1, (void **)&errstr, &errlen) != 0)
+    } else if (mapfile(errlog, -1, (void **) &errstr, &errlen) != 0)
 	exit(1);
 
     /* Analyze outputs */
@@ -95,36 +95,32 @@ checkrun(char *cfdir, char *job, char *outlog, char *errlog, char *to[], char *e
 
     /* Produce reports */
     rpt = 0;
-    while (rpt < 3)
-      {
+    while (rpt < 3) {
 	int mail[2], smstatus, err, env;
 	FILE *sm;
 	char *format, *argv[4];
 	pid_t child;
 
 	/* Check whether report should be sent */
-	if (to[rpt] == NULL)
-	  {
+	if (to[rpt] == NULL) {
 	    rpt += 1;
 	    continue;
-	  }
+	}
 	format = (rpt == 0) ? "HTML" : (rpt == 1) ? "Enriched" : "Text";
 	debug(DINFO, "Generating %s report to \"%s\"...", format, to[rpt]);
 
 	/* Create pipe to sendmail */
-	if (pipe(mail) != 0)
-	  {
+	if (pipe(mail) != 0) {
 	    error("pipe() failed for %s report: %s", format, ERRSTR);
 	    continue;
-	  }
+	}
 	sm = fdopen(mail[1], "w");
-	if (sm == NULL)
-	  {
+	if (sm == NULL) {
 	    error("fdopen() failed for %s report: %s", format, ERRSTR);
 	    close(mail[0]);
 	    close(mail[1]);
 	    continue;
-	  }
+	}
 
 	/* Spawn sendmail process */
 	argv[0] = cf_getstr(CF_SENDMAIL);
@@ -132,12 +128,11 @@ checkrun(char *cfdir, char *job, char *outlog, char *errlog, char *to[], char *e
 	argv[2] = "-i";
 	argv[3] = NULL;
 	child = exec(mail[0], 1, 2, 0, argv);
-	if (child < 0)
-	  {
+	if (child < 0) {
 	    error("Failed to send %s report", format);
 	    fclose(sm);
 	    continue;
-	  }
+	}
 
 	/* Fill in headers */
 	err = 1;
@@ -164,66 +159,65 @@ checkrun(char *cfdir, char *job, char *outlog, char *errlog, char *to[], char *e
 			  err_size, err_md5);
 	if (err > 0)
 	    err = fprintf(sm, "X-Shush-User: %s [%u]\n",
-			  (pw != NULL && pw->pw_name != NULL) ? pw->pw_name:"?",
+			  (pw != NULL
+			   && pw->pw_name != NULL) ? pw->pw_name : "?",
 			  getuid());
 	if (err > 0)
 	    err = fprintf(sm, "X-Shush-Command: %s\n", cf_getstr(CF_CMD));
-	if (err > 0)
-	  {
+	if (err > 0) {
 	    long lines;
 
 	    if (variable_get(V_OUTLINES, &lines) != 0)
 		abort();
-	    err = fprintf(sm, "X-Shush-Stdout-Size: %ld lines, %ld Bytes\n",
-			  lines, outlen);
-	  }
-	if (err > 0)
-	  {
+	    err =
+		fprintf(sm, "X-Shush-Stdout-Size: %ld lines, %ld Bytes\n",
+			lines, outlen);
+	}
+	if (err > 0) {
 	    long lines;
 
 	    if (variable_get(V_ERRLINES, &lines) != 0)
 		abort();
-	    err = fprintf(sm, "X-Shush-Stderr-Size: %ld lines, %ld Bytes\n",
-			  lines, errlen);
-	  }
+	    err =
+		fprintf(sm, "X-Shush-Stderr-Size: %ld lines, %ld Bytes\n",
+			lines, errlen);
+	}
 	if (err > 0 && rpt == 0)
 	    err = fprintf(sm, "Content-Type: text/html\n");
 	if (err > 0 && rpt == 1)
 	    err = fprintf(sm, "Content-Type: text/enriched\n");
 	if (err > 0)
 	    err = fprintf(sm, "\n");
-	if (err <= 0)
-	  {
+	if (err <= 0) {
 	    error("Error while writing mail headers for %s report: %s",
 		  format, ERRSTR);
 	    err = -1;
-	  }
-	else if (analyzer_output(sm,
-				 (rpt == 0) ? CF_FORMAT_HTML :
-				 (rpt == 1) ? CF_FORMAT_RICH : CF_FORMAT_TEXT,
-				 cf_getrptnum(rpt, CF_RPTSTDERR),
-				 cf_getrptnum(rpt, CF_RPTMAXSZ),
-				 outstr, outlen, errstr, errlen) != 0)
+	} else if (analyzer_output(sm,
+				   (rpt == 0) ? CF_FORMAT_HTML :
+				   (rpt ==
+				    1) ? CF_FORMAT_RICH : CF_FORMAT_TEXT,
+				   cf_getrptnum(rpt, CF_RPTSTDERR),
+				   cf_getrptnum(rpt, CF_RPTMAXSZ), outstr,
+				   outlen, errstr, errlen) != 0)
 	    error("Errors while sending output for %s report.", format);
 	if (fclose(sm) != 0 && err == 0)
 	    error("Errors while sending %s report: %s", format, ERRSTR);
 
 	/* Wait for sendmail child to complete */
-	while (1)
-	  {
+	while (1) {
 	    err = waitpid(child, &smstatus, 0);
-	    if (err == child && (WIFEXITED(smstatus) || WIFSIGNALED(smstatus)))
+	    if (err == child
+		&& (WIFEXITED(smstatus) || WIFSIGNALED(smstatus)))
 		break;
-	    if (err == -1)
-	      {
+	    if (err == -1) {
 		if (errno == EINTR)
 		    debug(DINFO, "waitpid(%d): %s", child, ERRSTR);
 		else
 		    error("waitpid(%d[sendmail for %s report]) failed: %s",
 			  child, format, ERRSTR);
-	      }
+	    }
 	    sleep(1);
-	  }
+	}
 	/* Child is done */
 
 	/* Check termination type */
@@ -235,5 +229,5 @@ checkrun(char *cfdir, char *job, char *outlog, char *errlog, char *to[], char *e
 		  format, strsignal(WTERMSIG(smstatus)));
 
 	rpt += 1;
-      }
+    }
 }

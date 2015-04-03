@@ -8,7 +8,7 @@
 */
 
 #if !defined(_OS_H_)
-# define _OS_H_
+#define _OS_H_
 
 /* get some help from autoconf, it's an evil world out there. */
 
@@ -27,24 +27,24 @@
 #include <string.h>
 
 #if !defined(HAVE_STRLCPY)
-# define strlcpy(x, y, z) strcpy(x, y)
+#define strlcpy(x, y, z) strcpy(x, y)
 #endif
 
 #if defined(HAVE_MD5DATA)
-# define MD5(x, y, z) MD5Data(x, y, z);
+#define MD5(x, y, z) MD5Data(x, y, z);
 #else
-# if defined(HAVE_MD5_CALC)
-#  define MD5(x, y, z) md5_calc(z+16, x, y); \
+#if defined(HAVE_MD5_CALC)
+#define MD5(x, y, z) md5_calc(z+16, x, y); \
 	{ \
 	  int i; \
 	  for(i = 0 ; i<16 ; i++) \
 	  sprintf(z + i*2, "%.2x", (unsigned char) z[i+16]); \
 	} \
 	z[32] = '\0';
-# else
-#  undef HAVE_MD5_H
-#  define MD5(x, y, z) z[0] = '\0';
-# endif
+#else
+#undef HAVE_MD5_H
+#define MD5(x, y, z) z[0] = '\0';
+#endif
 #endif
 
 #include "error.h"

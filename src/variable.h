@@ -8,7 +8,7 @@
 */
 
 #if !defined(_VARIABLE_H_)
-# define _VARIABLE_H_
+#define _VARIABLE_H_
 
 #define V_EXIT "exit"
 #define V_SIZE "size"
@@ -23,6 +23,6 @@
 #define V_TTY "tty"
 
 void variable_set(char *, long);
-int  variable_get(char *, long *);
+int variable_get(char *, long *);
 
 #endif

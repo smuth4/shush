@@ -8,7 +8,7 @@
 */
 
 #if !defined(_MMAP_H_)
-# define _MMAP_H_
+#define _MMAP_H_
 
 #include <sys/types.h>
 #include <sys/stat.h>

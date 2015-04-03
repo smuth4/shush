@@ -8,7 +8,7 @@
 */
 
 #if !defined(_CHECK_H_)
-# define _CHECK_H_
+#define _CHECK_H_
 
 void checkrun(char *, char *, char *, char *, char **, char **);
 

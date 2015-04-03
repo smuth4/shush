@@ -8,7 +8,7 @@
 */
 
 #if !defined(_GETHOSTNAME_H_)
-# define _GETHOSTNAME_H_
+#define _GETHOSTNAME_H_
 
 char *get_hostname(int);
 

@@ -8,7 +8,7 @@
 */
 
 #if !defined(_STATE_H_)
-# define _STATE_H_
+#define _STATE_H_
 
 void state_init(char *, char *);
 void state_delay(time_t);

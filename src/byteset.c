@@ -11,7 +11,8 @@
 
 #include "byteset.h"
 
-static char const rcsid[] = "@(#)$Id: byteset.c 1404 2008-03-08 23:25:46Z kalt $";
+static char const rcsid[] =
+    "@(#)$Id: byteset.c 1404 2008-03-08 23:25:46Z kalt $";
 
 static long set[256];
 static int once = 1;
@@ -20,26 +21,23 @@ static int once = 1;
 ** byteset_init
 **	Initialize set[] from a range definition string
 */
-void
-byteset_init(char *definition, int value)
+void byteset_init(char *definition, int value)
 {
     char *str, *tok, *dash;
     int i, j;
 
-    assert( definition != NULL );
+    assert(definition != NULL);
 
-    if (once == 1)
-      {
+    if (once == 1) {
 	once = 0;
 	i = 0;
 	while (i < 256)
 	    set[i++] = 0;
-      }
+    }
 
     str = strdup(definition);
     tok = strtok(str, ",");
-    while (tok != NULL)
-      {
+    while (tok != NULL) {
 	if (tok[0] == '-')
 	    i = 0;
 	else if (isdigit((int) tok[0]) != 0)
@@ -49,30 +47,26 @@ byteset_init(char *definition, int value)
 
 	j = i;
 	dash = index(tok, '-');
-	if (dash != NULL)
-	  {
-	    if (*(dash + 1) != '\0')
-	      {
+	if (dash != NULL) {
+	    if (*(dash + 1) != '\0') {
 		if (isdigit((int) *(dash + 1)) != 0)
 		    j = atoi(dash + 1);
 		else
 		    j = -1;
-	      }
-	    else
+	    } else
 		j = 255;
-	  }
+	}
 
-	if (i < 0 || i > 255 || j < 0 || j > 255 || j < i)
-	  {
+	if (i < 0 || i > 255 || j < 0 || j > 255 || j < i) {
 	    error("Invalid range: %s", tok);
 	    exit(1);
-	  }
+	}
 
 	while (i <= j)
 	    set[i++] = value;
 
 	tok = strtok(NULL, ",");
-      }
+    }
     free(str);
 }
 
@@ -80,10 +74,9 @@ byteset_init(char *definition, int value)
 ** byteset_set
 **	Sets the value of a byte in the set
 */
-void
-byteset_set(int byte, int value)
+void byteset_set(int byte, int value)
 {
-    assert( byte >= 0 && byte <= 255 );
+    assert(byte >= 0 && byte <= 255);
 
     set[byte] = value;
 }
@@ -92,10 +85,9 @@ byteset_set(int byte, int value)
 ** byteset_get
 **	Return the value of a byte in the set
 */
-int
-byteset_get(int byte)
+int byteset_get(int byte)
 {
-    assert( byte >= 0 && byte <= 255 );
+    assert(byte >= 0 && byte <= 255);
 
     return set[byte];
 }
