@@ -30,6 +30,7 @@ distclean:
 	@(cd src && $(MAKE) distclean)
 	/bin/rm -f Makefile config.cache config.log configure.lineno
 	/bin/rm -rf autom4te.cache
+	/bin/rm -f *.rpm
 
 rpm: shush
-	fpm -f -s dir -t rpm -n shush -v 1.2.3 ./src/shush=/usr/bin/ ./shush.1=/usr/share/man/
+	fpm -f --description "A generic wrapper around cron jobs" -s dir -t rpm -n shush -v 1.2.3 ./src/shush=/usr/bin/ ./shush.1=/usr/share/man/
