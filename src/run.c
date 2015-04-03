@@ -72,12 +72,18 @@ log(int level, char *format, ...)
 {
     va_list va;
 
-    va_start(va, format);
     if (copyslog)
-	vsyslog(level, format, va);
+      {
+        va_start(va, format);
+        vsyslog(level, format, va);
+        va_end(va);
+      }
     if (copyout)
-	vfprintf(stdout, format, va);
-    va_end(va);
+      {
+        va_start(va, format);
+        vfprintf(stdout, format, va);
+        va_end(va);
+      }
     if (copyout)
 	fprintf(stdout, "\n");
 }
