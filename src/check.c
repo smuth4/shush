@@ -28,9 +28,6 @@
 #include "variable.h"
 #include "version.h"
 
-static char const rcsid[] =
-    "@(#)$Id: check.c 1404 2008-03-08 23:25:46Z kalt $";
-
 static char *mystrftime(char *format, time_t when)
 {
     struct tm *tm;

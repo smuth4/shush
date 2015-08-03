@@ -13,11 +13,6 @@
 #include "error.h"
 #include "gethostname.h"
 
-#ifndef lint
-static char const rcsid[] =
-    "@(#)$Id: error.c 1404 2008-03-08 23:25:46Z kalt $";
-#endif
-
 static int prefix, tosyslog;
 static char *task, *id;
 

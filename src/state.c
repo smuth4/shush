@@ -19,9 +19,6 @@
 #include "units.h"
 #include "version.h"
 
-static char const rcsid[] =
-    "@(#)$Id: state.c 1404 2008-03-08 23:25:46Z kalt $";
-
 static char statepath[PATH_MAX];
 static int fd = -1;
 

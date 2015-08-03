@@ -11,8 +11,6 @@
 #include "ifparser.h"
 #include "ifparser.tab.h"
 
-static char const rcsid[] = "@(#)$Id: ifparser.l,v 1.5 2003-06-17 01:30:20 kalt Exp $";
-
 static char *inputstr;
 static int inputstrcur, inputstrlen;
 

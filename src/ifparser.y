@@ -12,8 +12,6 @@
 #include "byteset.h"
 #include "variable.h"
 
-static char const rcsid[] = "@(#)$Id: ifparser.y,v 1.5 2003-06-17 01:30:20 kalt Exp $";
-
 int ifparser_result;
 const char *ifparser_errmsg;
 

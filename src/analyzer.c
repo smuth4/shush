@@ -26,9 +26,6 @@
 #include "mmap.h"
 #include "variable.h"
 
-static char const rcsid[] =
-    "@(#)$Id: analyzer.c 1404 2008-03-08 23:25:46Z kalt $";
-
 time_t out_timestamp, err_timestamp;
 size_t out_size, err_size;
 char out_md5[33], err_md5[33];

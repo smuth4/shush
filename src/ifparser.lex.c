@@ -401,9 +401,6 @@ char *yytext;
 #include "ifparser.h"
 #include "ifparser.tab.h"
 
-static char const rcsid[] =
-    "@(#)$Id: ifparser.lex.c 1404 2008-03-08 23:25:46Z kalt $";
-
 static char *inputstr;
 static int inputstrcur, inputstrlen;
 

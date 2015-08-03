@@ -21,9 +21,6 @@
 #include "siglist.h"
 #include "units.h"
 
-static char const rcsid[] =
-    "@(#)$Id: cf.c 1404 2008-03-08 23:25:46Z kalt $";
-
 #define CFN  0			/* long */
 #define CFS  1			/* string */
 #define CFSL 2			/* list of strings */

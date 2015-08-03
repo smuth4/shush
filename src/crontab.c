@@ -25,9 +25,6 @@
 #include "mmap.h"
 #include "version.h"
 
-static char const rcsid[] =
-    "@(#)$Id: crontab.c 1404 2008-03-08 23:25:46Z kalt $";
-
 #define TAG "# DO NOT MODIFY THIS LINE -- shush depends on it!"
 
 static int getnext(char *cfdname, char **schedule, char **job, char **id)

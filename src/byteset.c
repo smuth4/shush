@@ -11,9 +11,6 @@
 
 #include "byteset.h"
 
-static char const rcsid[] =
-    "@(#)$Id: byteset.c 1404 2008-03-08 23:25:46Z kalt $";
-
 static long set[256];
 static int once = 1;
 

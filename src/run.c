@@ -41,9 +41,6 @@
 #include "variable.h"
 #include "version.h"
 
-static char const rcsid[] =
-    "@(#)$Id: run.c 1404 2008-03-08 23:25:46Z kalt $";
-
 static char *mylock, *job, *id, *jid;
 static time_t start;
 static struct passwd *pw;

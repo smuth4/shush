@@ -12,9 +12,6 @@
 
 #include "units.h"
 
-static char const rcsid[] =
-    "@(#)$Id: units.c 1404 2008-03-08 23:25:46Z kalt $";
-
 u_int unit_time(timestr)
 char *timestr;
 {
