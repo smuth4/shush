@@ -1,462 +1,344 @@
-.TH SHUSH 1 "$Date: 2007-09-30 23:38:23 $"
-.DA December 29, 2006
-.SH NAME
-shush - Run a command and optionally report its output by mail
-.SH SYNOPSIS
-.B shush
-[
-.B -h
-|
-.B -V
-]
-
-.B shush
-[
-.B -c \fIdir\fP
-] [
-.B -S
-|
-.B -s \fIfacility\fP
-] [
-.B -vfmk
-] \fIname\fP [ \fIID\fP ]
-
-.B shush
-[
-.B -c \fIdir\fP
-] [
-.B -H \fIto\fP
-] [
-.B -R \fIto\fP
-] [
-.B -T \fIto\fP
-] -C \fIname\fP [ \fIstdout\fP [ \fIstderr\fP ] ]
-
-.B shush
-[
-.B -i
-|
-.B -u
-|
-.B -r
-] [
-.B -c \fIdir\fP
-]
-
-.SH DESCRIPTION
-\fBshush\fP runs a command and optionally reports its output by mail.  It
-is a useful wrapper around cron jobs.  By default, \fBshush\fP will not
-produce any output when running as everything (if anything) is reported by
-mail.  However, configuration as well as critical errors will be reported
-on the standard error and (optionally) syslog.  Because interrupting
-\fBshush\fP has dire consequences including the likely loss of any output
-from the command, the following commonly used signals are ignored by
-\fBshush\fP: SIGHUP, SIGINT, SIGQUIT and SIGTERM.  If one really wants to
-kill a running instance of \fBshush\fP rather than killing the running
-managed command, SIGKILL may be used and shall serve as a reminder of how
-inappropriate such action typically is.
-
-For a command to be run using \fBshush\fP, a configuration file \fIname\fP
-must exist in the configuration directory (\fI$HOME/.shush\fP by
-default). This file defines how the command should be run as well when to
-send reports by mail.  For details on available configuration parameters,
-see the \fICONFIGURATION\fP section below.
-
-Two additional configuration files may exist: \fIname.stdout\fP and
-\fIname.stderr\fP (by default).  These files are used to look at the
-standard output and standard error (respectively) produced by the command.
-For details on how to use these, see the \fICOMMAND OUTPUT\fP section
-below.
-
-When the \fI-C\fP option is specified, \fBshush\fP will only load the
-configuration, optionally analyze the standard output and standard error
-from the specified files and finally produce sample reports if desired.
-This may also be used to produce reports if \fBshush\fP failed to properly
-terminate when running a command.  (The standard output and error from the
-command are normally found in files located under /tmp.)
-
-\fBshush\fP is able to manage \fIcrontab(5)\fP entries based on
-configurations defined by the user.  This may be done in one of two
-ways.  If a file named "\fIschedule\fP" exists in the configuration
-directory, then it is read for scheduling information.  Each line should
-contain a single entry containing three fields separated by whitespace(s).
-The fields are (in order) the hostname for which the entry applies or the
-character "*" to include all hosts, the configuration \fIname\fP,  and
-finally, the scheduling information in the same format as is used by the
-\fIschedule\fP parameter (see below).  To specify an \fIID\fP, use
-\fIname\fP:\fIID\fP as the second field.  If there is no file named
-"\fIschedule\fP", then \fBshush\fP checks the configuration directory for
-configuration files and adds them to the current user's \fIcrontab(5)\fP
-file as specified by the included \fIschedule\fP parameter (see below).  Files
-whose names start with the character "#" or end with the character "~" are
-ignored.
-
-.SH OPTIONS
-.IP "\fB-h\fP"
-Display a brief help message.
-.IP "\fB-V\fP"
-Display the version information.  Prefix with \fB-v\fP to display compile
-time defaults.
-.IP "\fB-c \fIdir\fP"
-Specify the directory where configurations are stored.
-.IP "\fB-s \fIfacility\fP"
-Defines the syslog facility to use for logging.
-.IP "\fB-S\fP"
-Disable syslog logging.
-.IP "\fB-v\fP"
-Copy information log messages to the standard output.
-.IP "\fB-f\fP"
-Fast mode:  Any configured \fIrandomdelay\fP is ignored.
-.IP "\fB-m\fP"
-Monitor and display the command's standard output and error in real time.
-.IP "\fB-k\fP"
-Keep the command's output log files instead of deleting them upon completion.
-.IP "\fB-C\fP"
-Check the configuration without running any command.
-.IP "\fB-H \fIto\fP"
-Send a sample HTML report to the specified recipient(s).
-.IP "\fB-R \fIto\fP"
-Send a sample enriched report to the specified recipient(s).
-.IP "\fB-T \fIto\fP"
-Send a sample text report to the specified recipient(s).
-.IP "\fB-i\fP"
-Use \fIcrontab(1)\fP to install a new \fIcrontab(5)\fP file for the current
-user.  The user must not already have a \fIcrontab(5)\fP file.
-.IP "\fB-u\fP"
-Use \fIcrontab(1)\fP to update the current user's \fIcrontab(5)\fP file,
-which must already exist.
-.IP "\fB-r\fP"
-Remove any entry added by the \fB-u\fP option from the current user's
-\fIcrontab(5)\fP.
-
-.SH CONFIGURATION
-\fBshush\fP configuration files consist of a main section, report
-section(s) and parameters.  The main section defines global parameters as
-well as defaults for reports.  Each report section begins with the name of
-the report between brackets.  Lines beginning with the character "#" are
-ignored.  Parameters should be specified only once.  If specified multiple
-times, all but the last occurrence will be ignored, unless noted otherwise.
-Parameters are defined using the following syntax:
-.RS
-.IP \fIname\fP=\fIvalue\fP
-.LP
-.RE
-or:
-.RS
-.IP \fIname\fP@\fIhostname\fP=\fIvalue\fP
-.LP
-.RE
-or:
-.RS
-.IP \fIname\fP%\fIID\fP=\fIvalue\fP
-.LP
-.RE
-or finally:
-.RS
-.IP \fIname\fP@\fIhostname\fP%\fIID\fP=\fIvalue\fP
-.LP
-.RE
-The second and fourth formats will be ignored unless \fBshush\fP is running
-on the specified hostname.  The third and fourth formats allow defining
-multiple instances of a single configuration file.  Such configuration
-files require an instance \fIID\fP to be specified in order to run.  Any
-configuration line using the third or fourth formats will be ignored if the
-\fIID\fP found on that line does not match the instance \fIID\fP used to
-run \fBshush\fP.
-
-The following parameters may appear in the main section:
-.IP "\fBcommand\fP"
-The actual command to run.  \fBshush\fP sets two environment variables
-before running the command: \fISHUSH_NAME\fP is set to \fIname\fP, and
-\fISHUSH_ID\fP is set to \fIID\fP.
-.IP "\fBconfig\fP"
-This defaults to the full path of the main configuration file.  The other
-two configuration file names are obtained by appending the ".stdout" and
-".stderr" suffixes to the value of this parameter.
-.IP "\fBlock\fP"
-If set, this parameter instructs \fBshush\fP to obtain a lock file before
-running the \fIcommand\fP, and defines the actions to take in case the
-\fIlockfile\fP is held by another process.  The format is a comma separated
-list of actions.  Valid actions are: a time duration (during which
-\fBshush\fP should simply wait and keep trying to obtain the
-\fIlockfile\fP), the string "abort" (indicating that \fBshush\fP should
-terminate immediately if the \fIlockfile\fP already exists), the string
-"ignore" (indicating that \fBshush\fP should ignore an existing
-\fIlockfile\fP), the string "loop" (to mark where to start again from when
-all actions have been executed) and the string "notify=" followed by mail addresses to
-which a notification mail should be sent.  Actions are executed in the
-order they are provided, and \fBshush\fP will wait forever trying to obtain
-the \fIlockfile\fP once all the actions have been executed, unless the
-string "loop" is one of defined actions.  Time durations may be specified
-in units of w(eeks), d(ays), h(ours), m(inutes) or s(econds).  If no unit
-is specified, it is assumed to be minutes.
-.IP "\fBlockfile\fP"
-By default, \fBshush\fP will use a file located in the same directory as
-the configuration file, and named after the configuration and host names.
-An alternate filename may be specified using this parameter.
-.IP "\fBlockmsg\fP"
-If set, this string will be used as subject for lock notification(s) mail
-messages.  The default is "[%u@%h] **PENDING** %N [%t]".  See the \fIMAIL
-SUBJECT\fP section for details on the format.
-.IP "\fBpath\fP"
-\fBshush\fP does not modify the environment, except to set the \fBPATH\fP
-variable if the \fIpath\fP parameter is set.
-.IP "\fBrandomdelay\fP"
-If this parameter is set, \fBshush\fP will wait up to the specified amount of
-time before starting the command unless invoked with the \fB-f\fP.  Valid
-time units are: s(econds), m(inutes), h(ours), d(ays), w(eeks).  If no
-unit is specified, it is assumed to be minutes.
-.IP "\fBschedule\fP"
-This defines when to run this command as a cron job, in a \fIcrontab\fP(5)
-compatible format.  Multiple entries may be specified using the character
-";" as separator.  Entries prefixed by the character "#" will be skipped.
-This parameter is not directly used by \fBshush\fP to run the command, but
-used by the \fB-i\fP and \fB-u\fP options.
-.IP "\fBsendmail\fP"
-This may be used to override the command used to send mail.
-.IP "\fBshell\fP"
-By default, the Bourne shell \fIsh(1)\fP is used to run the \fIcommand\fP,
-allowing any shell syntax to be used.  An alternate shell may be defined
-using this parameter.
-.IP "\fBstatedir\fP"
-This defines the directory where the status of \fBshush\fP is saved and
-defaults to the ".state" directory under where the configuration is
-located.  An error is generated if the directory does not exist unless this
-option was not set.  Setting this option to an empty string will prevent
-\fBshush\fP from saving its status.  \fIshlast(1)\fP uses these state files
-to report on running instances of \fBshush\fP as well as previous runs.
-.IP "\fBsyslog\fP"
-This parameter is \fBonly\fP used by the \fB-i\fP and \fB-u\fP options and
-has no other effect on \fBshush\fP.  It allows overriding the default syslog
-facility used for logging and defined at compile time.  If left blank, this
-suppresses the use of syslog.
-.IP "\fBtimeout\fP"
-This parameter allows one to control how long the \fIcommand\fP may run.
-It should be a comma separated list of actions.  Valid actions are: a time
-duration (during which \fBshush\fP should simply wait for the \fIcommand\fP
-to terminate), a signal (either "SIGNAME" or "-SIGNUMBER") that should be
-sent to the \fIcommand\fP's process group, a signal (either "=SIGNAME" or
-"=SIGNUMBER") that should be sent to the \fIshell\fP used to spawn the
-\fIcommand\fP, the string "loop" (to mark where to start again from when
-all actions have been executed) and the string "notify=" followed by mail
-addresses to which a notification mail should be sent.  Actions are
-executed in the order they are provided, and \fBshush\fP will wait forever
-if the \fIcommand\fP is still running once all the actions have been
-executed unless the string "loop" is one of defined actions.  Time
-durations may be specified in units of w(eeks), d(ays), h(ours), m(inutes)
-or s(econds).  If no unit is specified, it is assumed to be minutes.
-.IP "\fBtimeoutmsg\fP"
-If set, this string will be used as subject for timeout notification(s)
-mail messages.  The default is "[%u@%h] **TIMEOUT** %N [%t]".  See the
-\fIMAIL SUBJECT\fP section for details on the format.
-.LP
-The following parameters may appear anywhere in the configuration.  If
-specified in the main section, they define defaults settings that will
-apply to any report for which the same parameter has not been defined.
-.IP "\fBto\fP, \fBcc\fP, \fBbcc\fP"
-Where to send the mail report.
-.IP "\fBsubject\fP"
-Subject of the mail report.  See the \fIMAIL SUBJECT\fP section for details
-on the format.
-.IP "\fBheader\fP"
-Additional mail header(s).  Note that this parameter may be repeated to
-specify multiple headers.  However, only headers from the report (if
-specified) or from the main section will be used for a given report.
-.IP "\fBhostprefix\fP"
-By default, specified subjects are prefixed with the host name between
-brackets.  This parameter allows one to customize this prefix.  A positive integer
-indicates how many components of the fully qualified hostname should be
-shown.  A negative integer indicates how many trailing components of the
-fully qualified hostname should be trimmed.  The integer zero indicates
-that the prefix should be omitted.  This parameter is ignored if the
-"\fBsubject\fP" contains any "%" character.
-.IP "\fBuserprefix\fP"
-By default, specified subjects are prefixed with the username between
-brackets.  This parameter allows to disable this prefix.  Any non zero value
-indicates that the username should be shown while zero causes the prefix to
-be omitted.  This parameter is ignored if the "\fBsubject\fP" contains any "%"
-character.
-.IP "\fBoutput\fP" (previously "\fBstderr\fB")
-This defines how the command's standard output and standard error are
-captured and reported to the user:  "errfirst", "mixed", "outfirst".  When
-using "mixed", the \fIname.stderr\fP configuration file is ignored.  When
-using "errfirst" or "outfirst", individual reports may use one of the
-following two additional options "outonly" and "erronly".
-.IP "\fBformat\fP"
-Mail messages sending the output of the \fIcommand\fP may be sent in three
-different formats: "text" (the default), "enriched" text or "html".
-.IP "\fBsizelimit\fP"
-By default, the entire output of the \fIcommand\fP is sent in mail
-reports.  This parameter may be used to limit the size of the output included
-in a report.  Note that the total size of mail sent will be greater as this
-limit has no effect upon mail headers.  The size can be specified in units
-of m, k, b, c (MB, KB, Bytes).  If no unit is specified, it is assumed to
-be KB.  A limit of zero indicates that the output should not be truncated.
-.IP "\fBif\fP"
-A report is only sent if no \fIif\fP condition is specified or if the
-specified \fIif\fP condition is true.  The condition syntax allows for the
-usual logical operators ("||", "&&", "!"), comparison operators ("==",
-"!=", "<", "<=", ">", ">=") and basic arithmetic operators ("+", "-").
-Aside from counters defined by the configuration (see the \fICOMMAND
-OUTPUT\fP section below), the following variables may be used:
-.RS
-.IP "\fB$exit\fP"
-If the command terminated normally, this is its exit code.  Otherwise, it
-is negative and indicates the signal number having caused the command to
-terminate (e.g. -1 indicates signal number 1 caused the command to terminate).
-.IP "\fB$size\fP"
-output size (in bytes), same as "$outsize + $errsize"
-.IP "\fB$outsize\fP"
-size (in bytes) of standard output
-.IP "\fB$errsize\fP"
-size (in bytes) of standard error
-.IP "\fB$lines\fP"
-number of lines output
-.IP "\fB$outlines\fP"
-number of standard output lines
-.IP "\fB$errlines\fP"
-number of standard error lines
-.IP "\fB$runtime\fP"
-\fIcommand\fP run time (in seconds)
-.IP "\fB$utime\fP"
-user time used by the \fIcommand\fP
-.IP "\fB$stime\fP"
-system time used by the \fIcommand\fP
-.IP "\fB$tty\fP"
-1 if \fBshush\fP is run from a terminal (e.g. interactively), 0 otherwise.
-
-.SH MAIL SUBJECTS
-The "\fBlockmsg\fP", "\fBtimeoutmsg\fP" and "\fBsubject\fP" parameters may
-contain the following tokens which are expanded as described below:
-.RS
-.IP "\fB%%\fP"
-The "%" character
-.IP "\fB%h\fP"
-The hostname
-.IP "\fB%<digit>\fP" or "\fB%-<digit>\FP"
-A partial hostname: A positive digit indicates how many components of the
-fully qualified hostname to keep; a negative digit indicates how many
-trailing components of the fully qualified hostname to trim.
-.IP "\fB%i\fP"
-The instance \fIID\fP
-.IP "\fB%n\fP"
-The configuration \fIname\fP
-.IP "\fB%N\fP"
-The configuration \fIname\fP and instance \fIID\fP
-.IP "\fB%r\fP"
-The report name
-.IP "\fB%t\fP"
-The elapsed time.
-.IP "\fB%u\fP"
-The username.
-.IP "\fB%U\fP"
-The userid.
-
-If the "%" character is found in the "\fBsubject\fP" parameter, then the
-"\fBhostprefix\fP" and "\fBuserprefix\fP" parameters are ignored.
-
-.SH COMMAND OUTPUT
-After the \fIcommand\fP terminates, \fBshush\fP will use the contents of
-the \fIname.stdout\fP and \fIname.stderr\fP files (if they exist) to look
-at the output produced by the \fIcommand\fP.
-
-These files follow a simple format.  Each line is composed of a single
-character (the counter name) followed by a regular expression.
-
-All counters are initialized to 0 (zero).  Each line of output is matched
-against these regular expressions until a match is found.  If a match is
-found, the associated counter is incremented by one.  These counters may
-then be used as part of the main configuration, in an "\fBif\fP"
-configuration parameter, allowing the decision to send a mail
-report to be based on how many times certain regular expressions have been matched.
-
-Finally, regular expressions may define sub-expressions which will be
-rendered in bold in mail reports.
-
-Lines starting with the character "#" are considered to be comments and are
-ignored.  By default, standard regular expressions are used, unless the
-first line is "#pcre" in which case Perl compatible regular expressions are
-used.
-
-.SH ENVIRONMENT VARIABLES
-.IP HOME
-If the \fB-c\fP option is not used, \fBshush\fP will look for configuration
-files in \fI$HOME/.shush\fP.
-
-.IP SHUSH_SENDMAIL
-If defined, this should point to the \fIsendmail\fP(1) binary.  This
-variable overrides the "\fBsendmail\fP" configuration setting and should be
-used with care.
-
-.IP TMPDIR
-Directory where temporary files are created.
-
-.SH EXAMPLE
-The following configuration runs "shush -c /etc/shush -u" daily at 9:00,
-updating the user (root) crontab:
-
-.RS
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "SHUSH" "1" "August 2015" "" ""
+.
+.SH "NAME"
+\fBshush\fR \- Run a command and optionally report its output by email\.
+.
+.SH "SYNOPSIS"
+\fBshush\fR [ \fB\-h\fR | \fB\-v\fR ]
+.
+.P
+\fBshush\fR [ \fB\-c\fR \fIdir\fR ] [ \fB\-S\fR | \fB\-s\fR \fIfacility\fR ] [ \fB\-vmfk\fR ] \fIname\fR [ \fIID\fR ]
+.
+.P
+\fBshush\fR [ \fB\-c\fR \fIdir\fR ] [ \fB\-H\fR \fIto\fR ] [ \fB\-R\fR \fIto\fR ] [ \fB\-T\fR \fIto\fR ] \fB\-C\fR \fIname\fR [ \fIstdout\fR [ \fIstderr\fR ] ]
+.
+.P
+\fBshush\fR [ \fB\-i\fR | \fB\-u\fR | \fB\-r\fR ] [ \fB\-c\fR \fIdir\fR ]
+.
+.SH "DESCRIPTION"
+\fBshush\fR runs a command and optionally reports on it\'s status by email\. By default, \fBshush\fR will not relay any script output to stdout or stderr, as everything is meant to be reported by email\. Because interrupting \fBshush\fR ignores the following signals: SIGHUP, SIGINT, SIGQUIT, SIGTERM\. Such signals should be sent to the running command, rather than \fBshush\fR\. If you need to kill \fBshush\fR, SIGKILL may be used, but only with the knowledge that it should be an action of last resort\.
+.
+.P
+Configuration is managed from a directory (\fI$HOME/\.shush/\fR by default)\. For a command to be run using, it must have a configuration file with a unique name, as well as two optional files, suffixed with \.stdout and \.stderr respectively, in the configuration directory\. The contents of these files are described in the Configuration section\.
+.
+.P
+When the \-C option is specified, \fBshush\fR will load the configuration file and send any emails, but will not run the commands\. Two files can be specified, which will be fed into \fBshush\fR to produce any necessary reports\. This can be useful for both checking configartion syntax and testing the report output\. Additionally, if \fBshush\fR failed to properly terminate while running a command, the stdout and stderr will left in the /tmp/ directory, allowing you to manually produce reports for the interrupted run\.
+.
+.P
+\fBshush\fR is also able to manage \fBcrontab\fR(5) entries via the configuration files\. It will scan all files in the configuration directory for the schedule option, and will update the user\'s \fBcrontab\fR(5) accordingly\.
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-h\fR
+Display a brief help message\.
+.
+.TP
+\fB\-V\fR
+Display the version information\. Prefix with \fB\-v\fR to display compile time defaults\.
+.
+.TP
+\fB\-c\fR \fIdir\fR
+Specify the directory where configurations are stored\.
+.
+.TP
+\fB\-s\fR \fIfacility\fR
+Defines the syslog facility to use for logging\.
+.
+.TP
+\fB\-S\fR
+Disable syslog logging\.
+.
+.TP
+\fB\-v\fR
+Copy information log messages to the standard output\.
+.
+.TP
+\fB\-f\fR
+Fast mode: Any configured randomdelay is ignored\.
+.
+.TP
+\fB\-m\fR
+Monitor and display the command\'s standard output and error in real time\.
+.
+.TP
+\fB\-k\fR
+Keep the command\'s output log files instead of deleting them upon completion\.
+.
+.TP
+\fB\-C\fR
+Check the configuration without running any command\.
+.
+.TP
+\fB\-H\fR \fIto\fR
+Send a sample HTML report to the specified recipient(s)\.
+.
+.TP
+\fB\-R\fR \fIto\fR
+Send a sample enriched report to the specified recipient(s)\.
+.
+.TP
+\fB\-T\fR \fIto\fR
+Send a sample text report to the specified recipient(s)\.
+.
+.TP
+\fB\-i\fR
+Use crontab(1) to install a new \fBcrontab\fR(5) file for the current user\'s\. The user must not already have a \fBcrontab\fR(5) file\.
+.
+.TP
+\fB\-u\fR
+Use crontab(1) to update the current user\'s \fBcrontab\fR(5) file which must already exist\.
+.
+.TP
+\fB\-r\fR
+Remove any entry added by the \-u option from the current user\'s \fBcrontab\fR(5)\.
+.
+.SH "CONFIGURATION"
+\fBshush\fR configuration files consist of a main section, report section(s) and parameters The main section defines global parameters as well as defaults for reports\. Each report section begins with the name of the report between brackets\. Lines beginning with the character "#" are ignored\. Parameters should be specified only once\. If specified multiple times, all but the last occurrence will be ignored, unless noted otherwise\. Parameters are defined using the following syntax:
+.
+.P
+\fBname=value\fR
+.
+.P
+or optionally:
+.
+.P
+\fBname@hostname=value\fR
+.
+.P
+The second format allows the value to only be applied to a specific hostname\.
+.
+.P
+The following parameters appear only the the main section:
+.
+.SS "Main Section"
+Test:
+.
+.TP
+\fBcommand\fR
+The command to run\.
+.
+.TP
+\fBlock\fR
+If set, \fBshush\fR attempts to obtain a lock file before running the command, and can also specify the action to take if the lockfile already exists\. The value format is a comma\-separated list of actions\. Valid actions are:
+.
+.IP
+\fBabort\fR: Immediately exit\.
+.
+.IP
+\fBignore\fR: Ignore any lockfile and run anyway\.
+.
+.IP
+\fBloop\fR: Repeat the list of actions from the beginning\. Mostly useful when combined with a time duration\.
+.
+.IP
+a valid time duration: \fBshush\fR will wait for the specified time, continually trying to obtain the lockfile\. Time durations may be specified in units of w(eeks), d(ays), h(ours), m(inutes) or s(econds)\. If no unit is specified, it is assumed to be minutes\.
+.
+.IP
+\fBnotify=\fR\fI\fIemail\fR\fR: will notify the specified email that obtaining the lockfile failed\.
+.
+.TP
+\fBlockfile\fR
+By default, shush will use a file located in the same directory as the configuration file, and named after the configuration and host names\. An alternate filename may be specified using this option\.
+.
+.TP
+\fBlockmsg\fR
+If set, this string will be used as subject for lock notification(s) mail messages\.
+.
+.TP
+\fBpath\fR
+\fBshush\fR does not modify the environment, except to set the \fBPATH\fR variable if the path option is set\.
+.
+.TP
+\fBrandomdelay\fR
+If this option is set, shush will wait up the specified amount of time before starting the command unless invoked with the \fB\-f\fR\. Valid time units are: s(econds), m(inutes), h(ours), d(ays), w(eeks)\. If not unit is specified, it is assumed to be minutes\.
+.
+.TP
+\fBschedule\fR
+This defines when to run this command as a cron job in a \fBcrontab\fR(5) compatible format\. Multiple entries may be specified using the character ";" as separator\. Entries prefixed by the character "#" will be skipped\. This option is not directly used by shush to run the command, but used by the \-i and \-u options\.
+.
+.TP
+\fBsendmail\fR
+This may be used to override the command used to send mail\.
+.
+.TP
+\fBshell\fR
+By default, the Bourne shell \fBsh\fR(1) is used to run the command allowing any shell syntax to be used\. An alternate shell may be defined using this option\.
+.
+.TP
+\fBstderr\fR
+This defines how the command\'s standard errors are captured and reported to the user: "first", "mixed" or "last"\. When using "mixed", the name\.stderr file is ignored\.
+.
+.TP
+\fBsyslog\fR
+This option is \fIonly\fR used by the \fB\-i\fR and \fB\-u\fR options and has no other effect on shush\. It allows overriding the default syslog facility used for logging and defined at compile time\. If left blank, this supresses the use of syslog\.
+.
+.TP
+\fBtimeout\fR
+This option allows one to control how long the command may run\. It should be a comma separated list of actions\. Actions are executed in the order they are provided, and shush will wait forever if the command is still running once all the actions have been executed unless the string "loop" is one of defined actions\. Valid actions are:
+.
+.IP
+a valid time duration: Simply wait for the command to terminate\. Time durations may be specified in units of w(eeks), d(ays), h(ours), m(inutes) or s(econds)\.
+.
+.IP
+a signal (either \fISIGNAME\fR or \-\fISIGNUMBER\fR): To be sent the command\'s process group\.
+.
+.IP
+a signal (either =\fISIGNAME\fR or =\fISIGNUMBER\fR): To be sent the shell used to spawn the command\.
+.
+.IP
+\fBloop\fR: mark where to start again from when all actions have been executed
+.
+.IP
+\fBnotify=\fR\fIemail\fR: mail addresses to which a notification mail should be sent\. If no unit is specified, it is assumed to be minutes\.
+.
+.SS "Any section"
+.
+.TP
+\fBto\fR, \fBcc\fR, \fBbcc\fR
+Where to send the mail report\.
+.
+.TP
+\fBsubject\fR
+Subject of the mail report\.
+.
+.TP
+\fBheader\fR
+Additional mail header(s)\. Note that this parameter may be repeated to specify multiple headers\. However, only headers from the report (if specified) or from the main section will be used for a given report\.
+.
+.TP
+\fBhostprefix\fR
+By default, specified subjects are prefixed with the host name between brackets\. This option allows to customize this prefix\. A positive integer indicates how many hostname components should be shown\. With a negative integer, trailing components of the hostname are shown\. The integer zero indicates that the prefix should be omitted\.
+.
+.TP
+\fBuserprefix\fR
+By default, specified subjects are prefixed with the username between brackets\. This option allows to disable this prefix\. Any non zero value indicates that the username should be shown while zero causes the prefix to be omitted\.
+.
+.TP
+\fBformat\fR
+Mail messages sending the output of the command may be sent in three different formats: "text" (the default), "enriched" text or "html"\.
+.
+.TP
+\fBsizelimit\fR
+By default, the entire output of the command is sent in mail reports\. This option may be used to limit the size of the output included in a report\. Note that the total size of mail sent will be greater as this limit has no effect upon mail headers\. The size can be specified in units of m, k, b, c (MB, KB, Bytes)\. If no unit is specified, it is assumed to be KB\. A limit of zero indicates that the output should not be truncated\.
+.
+.TP
+\fBif\fR
+A report is only sent if no if condition is specified or if the specified if condition is true\. The condition syntax allows for the usual logical operators (\fB||\fR, \fB&&\fR, \fB!\fR), comparison operators (\fB==\fR, \fB!=\fR, \fB<\fR, \fB<=\fR, \fB>\fR, \fB>=\fR) and basic arithmetic operators (\fB+\fR, \fB\-\fR)\. Asides from counters defined by the configuration, the following variables may be used:
+.
+.IP
+\fB$exit\fR: If the command terminated normally, this is its exit code\. Otherwise, it is negative and indicates the signal number having caused the command to terminate (e\.g\. \-1 indicates signal number 1 caused the command to terminate)\.
+.
+.IP
+\fB$size\fR: Output size (in bytes), same as "$outsize + $errsize"
+.
+.IP
+\fB$outsize\fR: size (in bytes) of standard output
+.
+.IP
+\fB$errsize\fR: size (in bytes) of standard error
+.
+.IP
+\fB$lines\fR: number of lines output
+.
+.IP
+\fB$outlines\fR: number of standard output lines
+.
+.IP
+\fB$errlines\fR: number of standard error lines
+.
+.IP
+\fB$runtime\fR: command run time (in seconds)
+.
+.IP
+\fB$utime\fR: user time used by the command
+.
+.IP
+\fB$stime\fR: system time used by the command
+.
+.IP
+\fB$tty\fR: \fB1\fR if shush is run from a terminal (e\.g\. interactively), \fB0\fR otherwise\.
+.
+.SH "ENVIRONMENT VARIABLES"
+.
+.TP
+\fBHOME\fR
+If the \fB\-c\fR option is not used, shush will look for configuration files in \fB$HOME/\.shush\fR\.
+.
+.TP
+\fBSHUSH_SENDMAIL\fR
+If defined, this should point to the \fBsendmail\fR(1) binary\. This variable overrides the "sendmail" configuration setting and should be used with care\.
+.
+.TP
+\fBTMPDIR\fR
+Directory where temporary files are created\.
+.
+.SH "EXAMPLE"
+The following configuration runs "shush \-c /etc/shush \-u" daily at 9:00, updating the user (root) crontab:
+.
+.IP "" 4
+.
 .nf
-command=shush -c /etc/shush -u
+
+command=shush \-c /etc/shush \-u
 schedule=0 9 * * *
-lock=notify=root root-logs,abort
-timeout=5m,loop,notify=root root-logs,15m
+lock=notify=root root\-logs,abort
+timeout=5m,notify=root root\-logs
 stderr=first
 format=text
 Subject=Crontab Daily Update
 [logs]
-to=root-logs
+to=root\-logs
 [readers]
 if=$exit != 0 || $outlines != 1 || $errsize > 0 || U
 to=root
 format=rich
+.
 .fi
-.RE
-
+.
+.IP "" 0
+.
+.P
+Assuming the configuration above was place in a file name \fBupdate_shush_cron\fR, the next two files would be called \fBupdate_shush_cron\.stdout\fR and \fBupdate_shush_cron\.stderr\fR respectively\.
+.
+.P
 The associated configuration for standard output is:
-.RS
+.
+.IP "" 4
+.
 .nf
-Oshush: crontab updated\\.$
-U^.+$
+
+Oshush: crontab updated\e\.$
+U^(\.+)$
+.
 .fi
-.RE
-
+.
+.IP "" 0
+.
+.P
 and for standard error:
-.RS
-U^(.+)$
-.RE
+.
+.IP "" 4
+.
+.nf
 
-A lock will be set while running the command, and mail sent to "root" and
-"root-logs" if the lock is held by another process when \fBshush\fP starts,
-in which case \fBshush\fP will abort.  A mail will also be sent to "root"
-and "root-logs" if "shush -c /etc/shush -u" runs for more than 5 minutes,
-and for every 15 minutes following the first 5 minutes.
-
-Upon completion, the output will always be sent to "root-logs".
-Additionally, the output will be sent to "root" if the condition "$exit !=
-0 || $outlines != 1 || $errsize > 0 || U" is true.  For this condition to
-be true, one of the following must be true: the exit code is non zero,
-the command standard output was not a single line, there was output on
-standard error or finally, the counter "U" is non zero.  For the counter
-"U" to be non zero, there must be output on standard output other than the
-line "shush: crontab updated.".  Finally, any line of output produced on
-the standard error will be displayed in bold in mails sent to "root".
-
-.SH SEE ALSO
-.IR crontab (1),
-.IR pcre (3),
-.IR regex (3),
-.IR sendmail (1),
-.IR sh (1).
-
-.SH AVAILABILITY
-The latest official release of \fBshush\fP is available on the web.
-The home page is http://web.taranis.org/shush/
-
-.SH AUTHOR
-Christophe Kalt <kalt@taranis.org>
-
-.SH BUGS
-The \fB-C\fP option does not allow specifying an \fIID\fP.
-
-For other bugs, send reports to `shush-bugs@taranis.org'.
+U^(\.+)$
+.
+.fi
+.
+.IP "" 0
+.
+.P
+A lock will be set while running the command, and mail sent to "root" and "root\-logs" if the lock is held by another process when shush starts\. A mail will also be sent to "root" and "root\-logs" if "shush \-c /etc/shush \-u" runs for more than 5 minutes\. Upon completion, the output will always be sent to "root\-logs"\. Additionally, the output will be sent to "root" if the condition "$exit != 0 || $outlines != 1 || $errsize > 0 || U" is true\. For it to be true, one of the following must be true: the exit code is non zero, there was output on standard error or there was output on standard output other than the line "shush: crontab updated\."\. Any line of output other than "shush: crontab updated\." will be displayed in bold in mails sent to "root"\.
+.
+.SH "SEE ALSO"
+\fBcrontab\fR(1), \fBpcre\fR(3), \fBregex\fR(3), \fBsendmail\fR(1), \fBsh\fR(1)\.
+.
+.SH "AVAILABILITY"
+The latest official release of shush is available on github\. The old version is available on http://web\.taranis\.org/shush/\.
+.
+.SH "AUTHOR"
+Christophe Kalt \fIshush@taranis\.org\fR (Original author) Stephen Muth \fIsmuth4@gmail\.com\fR
