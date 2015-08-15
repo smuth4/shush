@@ -241,7 +241,7 @@ A lock will be set while running the command, and mail sent to "root" and "root-
 
 ## AVAILABILITY
 
-The latest official release of shush is available on github. The old version is available on http://web.taranis.org/shush/.
+The latest release of shush is available on github. The old version is available on http://web.taranis.org/shush/.
 
 ## AUTHOR
 
