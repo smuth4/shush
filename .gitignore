@@ -40,5 +40,6 @@ src/config.h
 
 # Makefile output
 src/shush
+src/ifparser_test
 src/signals.h
 *.rpm
