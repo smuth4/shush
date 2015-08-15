@@ -87,8 +87,6 @@ The following parameters appear only the the main section:
 
 ### Main Section
 
-Test:
-
   * `command`:
     The command to run.
 
