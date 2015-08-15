@@ -25,8 +25,8 @@ shush	: $(OBJS)
 pure	: $(OBJS)
 	purify $(CC) $(CPPFLAGS) $(CFLAGS) $(OBJS) $(LDFLAGS) $(LIBS) -o shush.pure
 
-ifparser_test: byteset.o ifparser_test.o ifparser.tab.o ifparser.lex.o
-	$(CC) $(CPPFLAGS) $(CFLAGS) byteset.o ifparser_test.o ifparser.tab.o ifparser.lex.o -o ifparser_test
+ifparser_test: byteset.o ifparser_test.o ifparser.tab.o ifparser.lex.o error.o gethostname.o variable.o
+	$(CC) $(CPPFLAGS) $(CFLAGS) byteset.o ifparser_test.o ifparser.tab.o ifparser.lex.o error.o gethostname.o variable.o -o ifparser_test
 
 depend  : $(SRCS)
 	@rm -f Makefile.deps
