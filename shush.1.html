@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>shush(1) - Run a command and optionally report its output by email.</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#OPTIONS">OPTIONS</a>
+    <a href="#CONFIGURATION">CONFIGURATION</a>
+    <a href="#ENVIRONMENT-VARIABLES">ENVIRONMENT VARIABLES</a>
+    <a href="#EXAMPLE">EXAMPLE</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
+    <a href="#AVAILABILITY">AVAILABILITY</a>
+    <a href="#AUTHOR">AUTHOR</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>shush(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>shush(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>shush</code> - <span class="man-whatis">Run a command and optionally report its output by email.</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>shush</code> [ <code>-h</code> | <code>-v</code> ]</p>
+
+<p><code>shush</code> [ <code>-c</code> <em>dir</em> ] [ <code>-S</code> | <code>-s</code> <em>facility</em> ] [ <code>-vmfk</code> ] <em>name</em> [ <em>ID</em> ]</p>
+
+<p><code>shush</code> [ <code>-c</code> <em>dir</em> ] [ <code>-H</code> <em>to</em> ] [ <code>-R</code> <em>to</em> ] [ <code>-T</code> <em>to</em> ] <code>-C</code> <em>name</em> [ <em>stdout</em> [ <em>stderr</em> ] ]</p>
+
+<p><code>shush</code> [ <code>-i</code> | <code>-u</code> | <code>-r</code> ] [ <code>-c</code> <em>dir</em> ]</p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p><code>shush</code> runs a command and optionally reports on it's status by email. By default, <code>shush</code> will not relay any script output to stdout or stderr, as everything is meant to be reported by email. Because interrupting <code>shush</code> ignores the following signals: SIGHUP, SIGINT, SIGQUIT, SIGTERM. Such signals should be sent to the running command, rather than <code>shush</code>. If you need to kill <code>shush</code>, SIGKILL may be used, but only with the knowledge that it should be an action of last resort.</p>
+
+<p>Configuration is managed from a directory (<em>$HOME/.shush/</em> by default). For a command to be run using, it must have a configuration file with a unique name, as well as two optional files, suffixed with .stdout and .stderr respectively, in the configuration directory. The contents of these files are described in the Configuration section.</p>
+
+<p>When the -C option is specified, <code>shush</code> will load the configuration file and send any emails, but will not run the commands. Two files can be specified, which will be fed into <code>shush</code> to produce any necessary reports. This can be useful for both checking configartion syntax and testing the report output. Additionally, if <code>shush</code> failed to properly terminate while running a command, the stdout and stderr will left in the /tmp/ directory, allowing you to manually produce reports for the interrupted run.</p>
+
+<p><code>shush</code> is also able to manage <code>crontab</code>(5) entries via the configuration files. It will scan all files in the configuration directory for the schedule option, and will update the user's <code>crontab</code>(5) accordingly.</p>
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<dl>
+<dt class="flush"><code>-h</code></dt><dd><p>Display a brief help message.</p></dd>
+<dt class="flush"><code>-V</code></dt><dd><p>Display the version information. Prefix with <code>-v</code> to display compile time defaults.</p></dd>
+<dt class="flush"><code>-c</code> <em>dir</em></dt><dd><p>Specify the directory where configurations are stored.</p></dd>
+<dt><code>-s</code> <em>facility</em></dt><dd><p>Defines the syslog facility to use for logging.</p></dd>
+<dt class="flush"><code>-S</code></dt><dd><p>Disable syslog logging.</p></dd>
+<dt class="flush"><code>-v</code></dt><dd><p>Copy information log messages to the standard output.</p></dd>
+<dt class="flush"><code>-f</code></dt><dd><p>Fast mode: Any configured randomdelay is ignored.</p></dd>
+<dt class="flush"><code>-m</code></dt><dd><p>Monitor and display the command's standard output and error in real time.</p></dd>
+<dt class="flush"><code>-k</code></dt><dd><p>Keep the command's output log files instead of deleting them upon completion.</p></dd>
+<dt class="flush"><code>-C</code></dt><dd><p>Check the configuration without running any command.</p></dd>
+<dt class="flush"><code>-H</code> <em>to</em></dt><dd><p>Send a sample HTML report to the specified recipient(s).</p></dd>
+<dt class="flush"><code>-R</code> <em>to</em></dt><dd><p>Send a sample enriched report to the specified recipient(s).</p></dd>
+<dt class="flush"><code>-T</code> <em>to</em></dt><dd><p>Send a sample text report to the specified recipient(s).</p></dd>
+<dt class="flush"><code>-i</code></dt><dd><p>Use <span class="man-ref">crontab<span class="s">(1)</span></span> to install a new <code>crontab</code>(5) file for the current user's. The user must not already have a <code>crontab</code>(5) file.</p></dd>
+<dt class="flush"><code>-u</code></dt><dd><p>Use <span class="man-ref">crontab<span class="s">(1)</span></span> to update the current user's <code>crontab</code>(5) file which must already exist.</p></dd>
+<dt class="flush"><code>-r</code></dt><dd><p>Remove any entry added by the -u option from the current user's <code>crontab</code>(5).</p></dd>
+</dl>
+
+
+<h2 id="CONFIGURATION">CONFIGURATION</h2>
+
+<p><code>shush</code> configuration files consist of a main section, report section(s) and parameters The main section defines global parameters as well as defaults for reports. Each report section begins with the name of the report between brackets. Lines beginning with the character "#" are ignored. Parameters should be specified only once. If specified multiple times, all but the last occurrence will be ignored, unless noted otherwise. Parameters are defined using the following syntax:</p>
+
+<p><code>name=value</code></p>
+
+<p>or optionally:</p>
+
+<p><code>name@hostname=value</code></p>
+
+<p>The second format allows the value to only be applied to a specific hostname.</p>
+
+<p>The following parameters appear only the the main section:</p>
+
+<h3 id="Main-Section">Main Section</h3>
+
+<dl>
+<dt class="flush"><code>command</code></dt><dd><p>The command to run.</p></dd>
+<dt class="flush"><code>lock</code></dt><dd><p>If set, <code>shush</code> attempts to obtain a lock file before running the command,
+and can also specify the action to take if the lockfile already exists.
+The value format is a comma-separated list of actions. Valid actions are:</p>
+
+<p><code>abort</code>: Immediately exit.</p>
+
+<p><code>ignore</code>: Ignore any lockfile and run anyway.</p>
+
+<p><code>loop</code>: Repeat the list of actions from the beginning. Mostly useful when combined with a time duration.</p>
+
+<p>a valid time duration: <code>shush</code> will wait for the specified time, continually trying to obtain the lockfile. Time durations may be specified in units of w(eeks), d(ays), h(ours), m(inutes) or s(econds). If no unit is specified, it is assumed to be minutes.</p>
+
+<p><code>notify=</code><em><var>email</var></em>: will notify the specified email that obtaining the lockfile failed.</p></dd>
+<dt><code>lockfile</code></dt><dd><p>By default, shush will use a file located in the same directory as the configuration file, and named after the configuration and host names. An alternate filename may be specified using this option.</p></dd>
+<dt class="flush"><code>lockmsg</code></dt><dd><p>If set, this string will be used as subject for lock notification(s) mail messages.</p></dd>
+<dt class="flush"><code>path</code></dt><dd><p><code>shush</code> does not modify the environment, except to set the <code>PATH</code> variable if the path option is set.</p></dd>
+<dt><code>randomdelay</code></dt><dd><p>If this option is set, shush will wait up the specified amount of time before starting the command unless invoked with the <code>-f</code>. Valid time units are: s(econds), m(inutes), h(ours), d(ays), w(eeks). If not unit is specified, it is assumed to be minutes.</p></dd>
+<dt><code>schedule</code></dt><dd><p>This defines when to run this command as a cron job in a <code>crontab</code>(5) compatible format. Multiple entries may be specified using the character ";" as separator. Entries prefixed by the character "#" will be skipped. This option is not directly used by shush to run the command, but used by the -i and -u options.</p></dd>
+<dt><code>sendmail</code></dt><dd><p>This may be used to override the command used to send mail.</p></dd>
+<dt class="flush"><code>shell</code></dt><dd><p>By default, the Bourne shell <code>sh</code>(1) is used to run the command allowing any shell syntax to be used. An alternate shell may be defined using this option.</p></dd>
+<dt class="flush"><code>stderr</code></dt><dd><p>This defines how the command's standard errors are captured and reported to the user: "first", "mixed" or "last". When using "mixed", the name.stderr file is ignored.</p></dd>
+<dt class="flush"><code>syslog</code></dt><dd><p>This option is <em>only</em> used by the <code>-i</code> and <code>-u</code> options and has no other effect on shush. It allows overriding the default syslog facility used for logging and defined at compile time. If left blank, this supresses the use of syslog.</p></dd>
+<dt class="flush"><code>timeout</code></dt><dd><p>This option allows one to control how long the command may run. It should be a comma separated list of actions. Actions are executed in the order they are provided, and shush will wait forever if the command is still running once all the actions have been executed unless the string "loop" is one of defined actions. Valid actions are:</p>
+
+<p>a valid time duration: Simply wait for the command to terminate. Time durations may be specified in units of w(eeks), d(ays), h(ours), m(inutes) or s(econds).</p>
+
+<p>a signal (either <em>SIGNAME</em> or -<em>SIGNUMBER</em>): To be sent the command's process group.</p>
+
+<p>a signal (either =<em>SIGNAME</em> or =<em>SIGNUMBER</em>): To be sent the shell used to spawn the command.</p>
+
+<p><code>loop</code>: mark where to start again from when all actions have been executed</p>
+
+<p><code>notify=</code><var>email</var>: mail addresses to which a notification mail should be sent. If no unit is specified, it is assumed to be minutes.</p></dd>
+</dl>
+
+
+<h3 id="Any-section">Any section</h3>
+
+<dl>
+<dt><code>to</code>, <code>cc</code>, <code>bcc</code></dt><dd><p>Where to send the mail report.</p></dd>
+<dt class="flush"><code>subject</code></dt><dd><p>Subject of the mail report.</p></dd>
+<dt class="flush"><code>header</code></dt><dd><p>Additional mail header(s). Note that this parameter may be repeated to specify multiple headers. However, only headers from the report (if specified) or from the main section will be used for a given report.</p></dd>
+<dt><code>hostprefix</code></dt><dd><p>By default, specified subjects are prefixed with the host name between brackets. This option allows to customize this prefix. A positive integer indicates how many hostname components should be shown. With a negative integer, trailing components of the hostname are shown. The integer zero indicates that the prefix should be omitted.</p></dd>
+<dt><code>userprefix</code></dt><dd><p>By default, specified subjects are prefixed with the username between brackets. This option allows to disable this prefix. Any non zero value indicates that the username should be shown while zero causes the prefix to be omitted.</p></dd>
+<dt class="flush"><code>format</code></dt><dd><p>Mail messages sending the output of the command may be sent in three different formats: "text" (the default), "enriched" text or "html".</p></dd>
+<dt><code>sizelimit</code></dt><dd><p>By default, the entire output of the command is sent in mail reports. This option may be used to limit the size of the output included in a report. Note that the total size of mail sent will be greater as this limit has no effect upon mail headers. The size can be specified in units of m, k, b, c (MB, KB, Bytes). If no unit is specified, it is assumed to be KB. A limit of zero indicates that the output should not be truncated.</p></dd>
+<dt class="flush"><code>if</code></dt><dd><p>A report is only sent if no if condition is specified or if the specified if condition is true. The condition syntax allows for the usual logical operators (<code>||</code>, <code>&amp;&amp;</code>, <code>!</code>), comparison operators (<code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>></code>, <code>&gt;=</code>) and basic arithmetic operators (<code>+</code>, <code>-</code>). Asides from counters defined by the configuration, the following variables may be used:</p>
+
+<p><code>$exit</code>: If the command terminated normally, this is its exit code. Otherwise, it is negative and indicates the signal number having caused the command to terminate (e.g. -1 indicates signal number 1 caused the command to terminate).</p>
+
+<p><code>$size</code>: Output size (in bytes), same as "$outsize + $errsize"</p>
+
+<p><code>$outsize</code>: size (in bytes) of standard output</p>
+
+<p><code>$errsize</code>: size (in bytes) of standard error</p>
+
+<p><code>$lines</code>: number of lines output</p>
+
+<p><code>$outlines</code>: number of standard output lines</p>
+
+<p><code>$errlines</code>: number of standard error lines</p>
+
+<p><code>$runtime</code>: command run time (in seconds)</p>
+
+<p><code>$utime</code>: user time used by the command</p>
+
+<p><code>$stime</code>: system time used by the command</p>
+
+<p><code>$tty</code>: <code>1</code> if shush is run from a terminal (e.g. interactively), <code>0</code> otherwise.</p></dd>
+</dl>
+
+
+<h2 id="ENVIRONMENT-VARIABLES">ENVIRONMENT VARIABLES</h2>
+
+<dl>
+<dt class="flush"><code>HOME</code></dt><dd><p>If the <code>-c</code> option is not used, shush will look for configuration files in <code>$HOME/.shush</code>.</p></dd>
+<dt><code>SHUSH_SENDMAIL</code></dt><dd><p>If defined, this should point to the <code>sendmail</code>(1) binary. This variable overrides the "sendmail" configuration setting and should be used with care.</p></dd>
+<dt class="flush"><code>TMPDIR</code></dt><dd><p>Directory where temporary files are created.</p></dd>
+</dl>
+
+
+<h2 id="EXAMPLE">EXAMPLE</h2>
+
+<p>The following configuration runs "shush -c /etc/shush -u" daily at 9:00, updating the user (root) crontab:</p>
+
+<pre><code>command=shush -c /etc/shush -u
+schedule=0 9 * * *
+lock=notify=root root-logs,abort
+timeout=5m,notify=root root-logs
+stderr=first
+format=text
+Subject=Crontab Daily Update
+[logs]
+to=root-logs
+[readers]
+if=$exit != 0 || $outlines != 1 || $errsize &gt; 0 || U
+to=root
+format=rich
+</code></pre>
+
+<p>Assuming the configuration above was place in a file name <code>update_shush_cron</code>, the next two files would be called <code>update_shush_cron.stdout</code> and <code>update_shush_cron.stderr</code> respectively.</p>
+
+<p>The associated configuration for standard output is:</p>
+
+<pre><code>Oshush: crontab updated\.$
+U^(.+)$
+</code></pre>
+
+<p>and for standard error:</p>
+
+<pre><code>U^(.+)$
+</code></pre>
+
+<p>A lock will be set while running the command, and mail sent to "root" and "root-logs" if the lock is held by another process when shush starts. A mail will also be sent to "root" and "root-logs" if "shush -c /etc/shush -u" runs for more than 5 minutes.  Upon completion, the output will always be sent to "root-logs". Additionally, the output will be sent to "root" if the condition "$exit != 0 || $outlines != 1 || $errsize > 0 || U" is true. For it to be true, one of the following must be true: the exit code is non zero, there was output on standard error or there was output on standard output other than the line "shush: crontab updated.". Any line of output other than "shush: crontab updated." will be displayed in bold in mails sent to "root".</p>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p><code>crontab</code>(1), <code>pcre</code>(3), <code>regex</code>(3), <code>sendmail</code>(1), <code>sh</code>(1).</p>
+
+<h2 id="AVAILABILITY">AVAILABILITY</h2>
+
+<p>The latest release of shush is available on github. The old version is available on http://web.taranis.org/shush/.</p>
+
+<h2 id="AUTHOR">AUTHOR</h2>
+
+<p>Christophe Kalt <a href="&#109;&#97;&#105;&#x6c;&#116;&#x6f;&#58;&#x73;&#104;&#x75;&#x73;&#104;&#x40;&#116;&#x61;&#x72;&#97;&#110;&#105;&#115;&#x2e;&#x6f;&#x72;&#103;" data-bare-link="true">&#x73;&#x68;&#117;&#115;&#104;&#64;&#x74;&#97;&#114;&#x61;&#x6e;&#105;&#115;&#x2e;&#111;&#114;&#103;</a> (Original author)
+Stephen Muth <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#x6f;&#58;&#115;&#x6d;&#117;&#x74;&#104;&#52;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#109;" data-bare-link="true">&#x73;&#109;&#x75;&#x74;&#x68;&#x34;&#64;&#103;&#109;&#97;&#x69;&#108;&#46;&#99;&#111;&#x6d;</a></p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>August 2015</li>
+    <li class='tr'>shush(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

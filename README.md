@@ -10,4 +10,4 @@ If you have [fpm](https://github.com/jordansissel/fpm) installed, you can run `m
 
 ## Configuration
 
-See the [man page](http://web.taranis.org/shush/shush.1.html).
+See the [man page](shush.md).
