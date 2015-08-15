@@ -20,9 +20,6 @@
 #include "crontab.h"
 #include "run.h"
 
-static char const rcsid[] =
-    "@(#)$Id: shush.c 1404 2008-03-08 23:25:46Z kalt $";
-
 extern char *optarg;
 extern int optind, opterr;
 

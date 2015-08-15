@@ -22,9 +22,6 @@
 
 #include "exec.h"
 
-static char const rcsid[] =
-    "@(#)$Id: exec.c 1404 2008-03-08 23:25:46Z kalt $";
-
 static void fatal(int, char *, ...)
 #if ( __GNUC__ == 2 && __GNUC_MINOR__ >= 5 ) || __GNUC__ >= 3
     __attribute__ ((__noreturn__))

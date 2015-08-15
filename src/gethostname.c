@@ -11,9 +11,6 @@
 
 #include "gethostname.h"
 
-static char const rcsid[] =
-    "@(#)$Id: gethostname.c 1404 2008-03-08 23:25:46Z kalt $";
-
 char *get_hostname(int dots)
 {
     static char hostname[MAXHOSTNAMELEN + 1];

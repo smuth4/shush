@@ -14,9 +14,6 @@
 #include "siglist.h"
 #include "signals.h"
 
-static char const rcsid[] =
-    "@(#)$Id: siglist.c 1404 2008-03-08 23:25:46Z kalt $";
-
 int getsignumbyname(char *name)
 {
     int i;

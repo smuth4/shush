@@ -11,9 +11,6 @@
 
 #include "variable.h"
 
-static char const rcsid[] =
-    "@(#)$Id: variable.c 1404 2008-03-08 23:25:46Z kalt $";
-
 struct variable {
     char *name;
     long value;

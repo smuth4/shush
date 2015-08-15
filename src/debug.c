@@ -11,11 +11,6 @@
 
 #include "debug.h"
 
-#ifndef lint
-static char const rcsid[] =
-    "@(#)$Id: debug.c 1404 2008-03-08 23:25:46Z kalt $";
-#endif
-
 static int debug_level;
 
 /*
