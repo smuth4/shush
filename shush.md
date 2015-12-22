@@ -15,9 +15,9 @@ shush(1) -- Run a command and optionally report its output by email.
 
 `shush` runs a command and optionally reports on it's status by email. By default, `shush` will not relay any script output to stdout or stderr, as everything is meant to be reported by email. Because interrupting `shush` ignores the following signals: SIGHUP, SIGINT, SIGQUIT, SIGTERM. Such signals should be sent to the running command, rather than `shush`. If you need to kill `shush`, SIGKILL may be used, but only with the knowledge that it should be an action of last resort.
 
-Configuration is managed from a directory (*$HOME/.shush/* by default). For a command to be run using, it must have a configuration file with a unique name, as well as two optional files, suffixed with .stdout and .stderr respectively, in the configuration directory. The contents of these files are described in the Configuration section.
+Configuration is managed from a directory (`$HOME/.shush/` by default). For a command to be run using `shush`, it must have a configuration file with a unique name, as well as two optional files, suffixed with .stdout and .stderr respectively, in the configuration directory. The contents of these files are described in the Configuration section.
 
-When the -C option is specified, `shush` will load the configuration file and send any emails, but will not run the commands. Two files can be specified, which will be fed into `shush` to produce any necessary reports. This can be useful for both checking configartion syntax and testing the report output. Additionally, if `shush` failed to properly terminate while running a command, the stdout and stderr will left in the /tmp/ directory, allowing you to manually produce reports for the interrupted run.
+When the -C option is specified, `shush` will load the configuration file and send any emails, but will not run the commands. Two files can be specified, which will be fed into `shush` to produce any necessary reports. This can be useful for both checking configartion syntax and testing the report output. Additionally, if `shush` failed to properly terminate while running a command, the stdout and stderr will left in the `$TMPDIR` directory (usually `/tmp/`), allowing you to manually produce reports for the interrupted run.
 
 `shush` is also able to manage `crontab`(5) entries via the configuration files. It will scan all files in the configuration directory for the schedule option, and will update the user's `crontab`(5) accordingly.
 
@@ -115,7 +115,7 @@ The following parameters appear only the the main section:
     `shush` does not modify the environment, except to set the `PATH` variable if the path option is set.
 
   * `randomdelay`:
-    If this option is set, shush will wait up the specified amount of time before starting the command unless invoked with the `-f`. Valid time units are: s(econds), m(inutes), h(ours), d(ays), w(eeks). If not unit is specified, it is assumed to be minutes.
+    If this option is set, shush will wait up to the specified amount of time before starting the command (unless invoked with the `-f`). Valid time units are: s(econds), m(inutes), h(ours), d(ays), w(eeks). If not unit is specified, it is assumed to be minutes.
 
   * `schedule`:
     This defines when to run this command as a cron job in a `crontab`(5) compatible format. Multiple entries may be specified using the character ";" as separator. Entries prefixed by the character "#" will be skipped. This option is not directly used by shush to run the command, but used by the -i and -u options.
@@ -192,6 +192,10 @@ The following parameters appear only the the main section:
     `$stime`: system time used by the command
 
     `$tty`: `1` if shush is run from a terminal (e.g. interactively), `0` otherwise.
+    
+### Handling stdout and stderr
+
+Shush supports having two files, suffixed with `.stderr` or `.stdout`, to complement the main configuration file. Each of these files should contain a single uppercase letter, followed by a regex. Any lines matching the regex will add a counter to a variable identified by the initial letter, which can then be referenced in an `if` statement. The first successful match will cause the processing to stop. Unlike the variables listed above, no leading `$` should be used when referencing them in the `if` block.
 
 ## ENVIRONMENT VARIABLES
 
@@ -202,7 +206,7 @@ The following parameters appear only the the main section:
     If defined, this should point to the `sendmail`(1) binary. This variable overrides the "sendmail" configuration setting and should be used with care.
 
   * `TMPDIR`:
-    Directory where temporary files are created.
+    Directory where temporary files, such as the lock files, are created.
 
 ## EXAMPLE
 
@@ -222,7 +226,7 @@ The following configuration runs "shush -c /etc/shush -u" daily at 9:00, updatin
     to=root
     format=rich
 
-Assuming the configuration above was place in a file name `update_shush_cron`, the next two files would be called `update_shush_cron.stdout` and `update_shush_cron.stderr` respectively.
+Assuming the configuration above was placed in a file named `update_shush_cron`, the next two files would be named `update_shush_cron.stdout` and `update_shush_cron.stderr` respectively.
 
 The associated configuration for standard output is:
 
@@ -233,7 +237,7 @@ and for standard error:
 
     U^(.+)$
 
-A lock will be set while running the command, and mail sent to "root" and "root-logs" if the lock is held by another process when shush starts. A mail will also be sent to "root" and "root-logs" if "shush -c /etc/shush -u" runs for more than 5 minutes.  Upon completion, the output will always be sent to "root-logs". Additionally, the output will be sent to "root" if the condition "$exit != 0 || $outlines != 1 || $errsize > 0 || U" is true. For it to be true, one of the following must be true: the exit code is non zero, there was output on standard error or there was output on standard output other than the line "shush: crontab updated.". Any line of output other than "shush: crontab updated." will be displayed in bold in mails sent to "root".
+A lock will be set while running the command, and an email will be sent to "root" and "root-logs" if the lock is held by another process when shush starts. A mail will also be sent to "root" and "root-logs" if "shush -c /etc/shush -u" runs for more than 5 minutes.  Upon completion, the output will always be sent to "root-logs". Additionally, the output will be sent to "root" if the condition "$exit != 0 || $outlines != 1 || $errsize > 0 || U" is true. For it to be true, one of the following must be true: the exit code is non zero, there was output on standard error or there was output on standard output other than the line "shush: crontab updated.". Any line of output other than "shush: crontab updated." will be displayed in bold in an email sent to "root".
 
 ## SEE ALSO
 
