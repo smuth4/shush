@@ -746,6 +746,10 @@ run(char *cfdir, char *myjob, char *myid, char *slfac, int options,
 	end = 0;
 
     /* Spawn child process */
+    if (cf_getstr(CF_CMD) == NULL) {
+        error("Failed to retrieve a runnable command");
+        exit(1);
+    }
     argv[0] = cf_getstr(CF_SHELL);
     argv[1] = "-c";
     argv[2] = cf_getstr(CF_CMD);
